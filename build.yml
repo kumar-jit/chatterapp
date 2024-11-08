@@ -10,7 +10,7 @@ jobs:
         name: Check Node version
       - run:  npm --version
         name: Check NPM version
-      - uses: action/checkout@v3
+      - uses: action/checkout@v4
         name: checkout code from Github
       - run: npm install
         name: install NPM package
