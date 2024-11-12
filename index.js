@@ -3,6 +3,8 @@ import http from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import {errorHandlerMiddleware, errorHandelMiddlewareOfSocket} from './src/middleware/errHandalerMiddleware.js'
 import userRouter from './src/routes/user.routes.js';
@@ -10,6 +12,10 @@ import {authenticateUserViaHttp,authenticateUserViaSocket} from './src/middlewar
 import { MessageBuilder } from './src/utils/msgBuilder.js';
 import { createRoom, getAllMsgByRoom, getRoomMemberList, handelUserJoin, saveMessage,removeUserFromGroup } from './src/controllers/Rooms/room.controller.js';
 import { updateActiveStatus } from './src/controllers/User/users.contorller.js';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -32,7 +38,13 @@ export const server = http.createServer(app);
 
 app.use(express.json());
 
-app.use("/chatterApp", express.static("./src/public/"));
+app.use("/", express.static("./src/public/"));
+
+// Serve login.html when accessing the root URL
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "/src/public/login.html"));
+});
+
 
 // app.use()
 app.use("/api/user", userRouter);
@@ -99,7 +111,7 @@ io.on("connection", async (socket) => {
     })
 
     socket.on("typing", (typingInfo) => {
-        if(typingInfo. typingStatus){
+        if(typingInfo.typingStatus){
             socket.to(typingInfo.roomId).emit("on-typing", socket.user.name)
         }
         else{

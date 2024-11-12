@@ -31,7 +31,7 @@ const checkIsLoggedIn = () => {
     if(localStorage.getItem("jwttoken") && localStorage.getItem("email"))
         return
     else
-        window.location.href = "/chatterApp/login.html"
+        window.location.href = "/login.html"
 }
 
 socket.on("connect", () => {
@@ -234,6 +234,12 @@ const onRoomSelect = (oEvent) => {
     joinRoom(oEvent.target.value);
 };
 
+// Attach `input` event listener instead of `keypress`
+// const messageInput = document.getElementById("message-input");
+// messageInput.addEventListener("input", onEnterPressKey);
+// messageInput.addEventListener("focus", onEnterPressKey); // Detect focus as start of typing on mobile
+// messageInput.addEventListener("keydown", onEnterPressKey);
+
 const onEnterPressKey = (event) => {
     if(event.key == 'Enter')
         onSendMessage();
@@ -369,7 +375,14 @@ const renderChat = (message, isCurrentUser) => {
         isCurrentUser = (user.email == localStorage.getItem("email")) ? true : isCurrentUser; 
         chatContainer.insertAdjacentHTML("beforeend",renderMessage(user.name , message.content, message.timestamp, isCurrentUser, user.avatar));    
     }
-   chatContainer.scrollTop += 500;
+    
+    //scroll down to end
+    requestAnimationFrame(() => {
+        const lastMessage = chatContainer.lastElementChild;
+        if (lastMessage) {
+            lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+    });
 }
 
 // render left chat

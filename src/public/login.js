@@ -1,8 +1,19 @@
 const container = document.getElementById("container");
 const registerBtn = document.getElementById("register");
 const loginBtn = document.getElementById("login");
-const hostUrl = "http://localhost:3000";
 
+
+window.addEventListener("load", ()=>{
+    checkIsLoggedIn();
+});
+
+
+const checkIsLoggedIn = () => {
+    if(localStorage.getItem("jwttoken") && localStorage.getItem("email"))
+        window.location.href = "/home.html"
+    else
+        return;
+}
 
 // Toggle between sign-in and sign-up forms
 registerBtn.addEventListener("click", () => {
