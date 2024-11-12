@@ -3,6 +3,7 @@
 :root {
     --side-width:25%;
     --main-width:50%;
+    --mobile-width:100%;
     --primary-title-text-color:rgb(165, 174, 212);
     --primary-text-color: #ffffff;
     --secondary-text-color: #b0b0b0;
@@ -23,6 +24,8 @@
     --border-color2: #9999993a;
     --btn-color-1: rgb(6, 56, 121);
     --btn-color-1-hover:rgb(10, 79, 168);
+    --btn-color-2:rgba(223, 23, 23, 0.705);
+    --btn-color-2-hover:rgba(219, 51, 51, 0.904);
     --Nav-hight: 5rem;
 }
 
@@ -78,44 +81,70 @@ h1,h2,h3,h4,h5,h6 {
 
 /* ---------------------------- Navbar Container ---------------------------- */
 
-.nav-bar-container{
-    display: 100%;
+.nav-bar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 0.5rem 1rem;
     height: var(--Nav-hight);
     box-sizing: border-box;
-    position: relative;
+    background-color: var(--third-background); /* Dark background color */
+    color: var(--primary-text-color); /* Primary text color */
+    border-bottom: var(--border); /* Adds a subtle border at the bottom */
 }
-.profile-details{
-    width: calc(var(--Nav-hight) - 1rem);
-    /* width: fit-content; */
-    position: relative;
+
+.profile-details {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
+    gap: 0.5rem;
 }
-.profile-image{
-    width: 70%;
-    height: 70%;
+
+.profile-image {
+    width: 2.5rem;
+    height: 2.5rem;
     position: relative;
 }
-.online-status::after{
+
+.online-status::after {
     position: absolute;
     content: "";
     top: 0;
+    right: 0;
     border-radius: 50%;
-    height: 0.7rem;
-    width: 0.7rem;
-    background-color: rgb(5, 224, 5);
-    right: 5%;
+    height: 0.6rem;
+    width: 0.6rem;
+    background-color: var(--online-status-color); /* Green color for online status */
+    border: 2px solid var(--third-background); /* Border to make it stand out */
 }
-.nav-name{
 
+.nav-name {
+    font-size: 1em;
+    color: var(--primary-title-text-color); /* Use a lighter shade for the name */
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Handle long names gracefully */
+    margin-left: 0.8rem;
 }
-.nav-dp{
+
+.nav-dp {
     width: 100%;
     height: 100%;
     border-radius: 50%;
+    border: 2px solid var(--profile-image-border); /* Border color from theme */
+}
+
+.logout-container button {
+    padding: 0.5rem 1rem;
+    background-color: var(--btn-color-1); /* Button background color */
+    color: #fff;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.logout-container button:hover {
+    background-color: var(--btn-color-1-hover); /* Button hover color */
 }
 
 
@@ -131,13 +160,20 @@ h1,h2,h3,h4,h5,h6 {
 .box-container-header{
     background-color: var(--background-color);
     display: flex;
-    justify-content: center;
     align-items: center;
-    padding: 0.5rem 0rem;
+    padding: 0.5rem 0.8rem;
     height: fit-content;
     width: 100%;
     color: var(--primary-title-text-color);
     border: 0.5px solid var(--border-color2);
+    box-sizing: border-box;
+}
+
+.justify-content-center{
+    justify-content: center;
+}
+.justify-content-spacebetween{
+    justify-content: space-between;
 }
 
 .box-container-header span{
@@ -225,7 +261,11 @@ h1,h2,h3,h4,h5,h6 {
     height: inherit;
     width: inherit;
 }
-
+.typing-notify{
+    padding: 0.2rem 0.5rem;
+    color: var(--foreground-color);
+    background-color: var(--member-profile-background);
+}
 /* Chat interface container */
 .msger {
     display: flex;
@@ -477,6 +517,21 @@ h1,h2,h3,h4,h5,h6 {
     border-radius: 50%;
 }
 
+.room-ext-btn{
+    margin-bottom: 0.8rem;
+    width: 100%;
+    padding: 10px 0px;
+    box-sizing: border-box;
+    background-color: var(--btn-color-2);
+    border: none;
+    color: var(--foreground-color);
+    font-weight: 600;
+}
+
+.room-ext-btn:hover{
+    background-color: var(--btn-color-2-hover);
+}
+
 /* --------------------------------- dialog --------------------------------- */
 /* Dialog Box Container */
 .dialogBox {
@@ -528,6 +583,11 @@ h1,h2,h3,h4,h5,h6 {
 /* Input container */
 .join-container, .create-container {
     margin-bottom: 1rem; /* Spacing between sections */
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
 }
 
 /* Input and Textarea styling */
@@ -539,12 +599,14 @@ input[type="text"], textarea {
     border-radius: 5px; /* Rounded edges */
     background: var(--member-profile-background);
     color: var(--primary-text-color);
+    box-sizing: border-box;
 }
 
 /* Button styling */
-button {
+.dialog-btn {
     padding: 0.5rem 1rem;
     background: var(--btn-color-1);
+    width: 100%;
     color: #fff;
     font-weight: bold;
     cursor: pointer;
@@ -564,8 +626,82 @@ hr {
     border-top: 1px solid var(--border-color2); /* Using variable for color */
     margin: 0.5rem 0; /* Spacing for better separation */
 }
+.dialog-title2{
+    color: var(--primary-text-color);
+
+}
 
 /* Hide element when necessary */
 .disPlayNone {
     display: none;
+}
+
+.onlyMobileView{
+    visibility: hidden;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                             Mobile Device style                            */
+/* -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 860px) {
+    .side-width{
+        width: var(--mobile-width);
+    }
+    .main-width{
+        width: var(--mobile-width);
+    }
+    .mobileCompability{
+        display: none;
+    }
+    .onlyMobileView{
+        visibility: visible;
+    }
+
+    /* -------------------------- chat for mobile scren ------------------------- */
+
+    /* Reduce chat bubble padding and maximum width */
+    .msg-bubble {
+        padding: 10px;
+        max-width: 250px; /* Smaller max width for mobile */
+        font-size: 0.9em; /* Smaller font size for mobile */
+    }
+    
+    /* Adjust profile image size */
+    .msg-img {
+        width: 35px; /* Smaller width for mobile */
+        height: 35px; /* Smaller height for mobile */
+        margin-right: 8px;
+    }
+    
+    /* Adjust spacing and layout */
+    .msg-info-name {
+        font-size: 0.9em; /* Slightly smaller font size */
+    }
+    
+    .msger-inputarea * {
+        font-size: 0.9em; /* Reduce font size in input area */
+    }
+
+    /* Reduce padding in the message input area for a more compact view */
+    .msger-inputarea {
+        padding: 8px;
+    }
+
+    /* Adjust send button size */
+    .msger-send-btn {
+        padding: 8px 10px;
+        font-size: 0.9em;
+    }
+    
+    /* Modify scrollbars for mobile view */
+    .scroll-style::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    /* ---------------------------- Dialog box mobile --------------------------- */
+    /* Dialog Box Inner Container */
+.dialogBox-conatiner {
+    width: var(--mobile-width);
+}
 }

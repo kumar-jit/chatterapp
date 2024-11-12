@@ -213,3 +213,20 @@ body{
     color: red;
     font-size: small;
 }
+
+/* Default styles for larger screens */
+/* .container {
+    background-color: white;
+    border-radius: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-height: 480px;
+    transition: all 0.6s ease-in-out;
+} */
+
+/* Mobile view: Full height for each form container and vertical stacking */
+@media (max-width: 768px) {
+}

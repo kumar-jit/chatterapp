@@ -4,11 +4,20 @@ const socket = io.connect(url, {
     auth: { token } // Pass token using auth property
 });
 
-const userInformation = {
-    email : null,
-    name : null,
-    imgUrl : null
+// list of main conatiner
+const mainContainerList = [
+    document.getElementById("roomsListContainer"),
+    document.getElementById("chatContainer"),
+    document.getElementById("roomInfoContainer"), 
+]
+
+const typingInfo = {
+    user : "",
+    isTyping : false,
+    typingTimeout: null
 }
+
+
 
 const loadChatRooms = () => {
     let userDetails = httpGetCall("");
@@ -32,6 +41,10 @@ socket.on("connect", () => {
 const getUserInformation = async () => {
     let user = await httpGetCall("/api/user/getMyInfo");
     renderChatRoomInfoContainer(user);
+}
+
+const isMobileDevice = () => {
+    return (window.innerWidth <= 860)
 }
 
 // making HTTP call using axios
@@ -98,7 +111,9 @@ const createRoom = (roomInfo) => {
     }
 }
 
-const sendMessage = (roomId, message) => {
+const sendMessage = (roomId, message="") => {
+    if(message.trim() == "" || message == undefined || message.length <= 0)
+        return
     socket.emit("send-msg", {roomId : roomId, message : message});
 }
 
@@ -123,8 +138,24 @@ const afterRoomJoindOrCreate = (rooms) => {
     document.getElementById("inputRoomId").value = "";
     document.getElementById("inputRoomName").value = "";
     document.getElementById("inputRoomDesc").value = "";
+    sessionStorage.setItem("roomId",rooms.roomId)
+
+    // if current device is mobile then 
+    if(isMobileDevice())
+        hideUnhideOnMobileDevice("chatContainer"); // hide the room list and display the chat room
 }
 
+const onLogout = () =>{
+    socket.emit("disconnect");
+}
+
+const notifyTypying = () => {
+    socket.emit("typing", { roomId : sessionStorage.getItem("roomId"), typingStatus : typingInfo.isTyping }); // Emit typing event
+}
+
+const onRoomExit = () => {
+    socket.emit("exit-room", {roomId : sessionStorage.getItem("roomId")} );
+}
 socket.on("message-brodcust", (messageDetails) => {
     renderChat(messageDetails, false);
 })
@@ -137,9 +168,21 @@ socket.on("inform-user-to-update-room-member-List", ({ userId, activeStatus}) =>
     updateUserStatus(userId,activeStatus);
 })
 
-const onLogout = () =>{
-    socket.emit("disconnect");
-}
+socket.on("on-typing", (name) => {
+    if(name && name != "")
+        renderTypingInfo(name, "typing")
+    else
+        renderTypingInfo("","stopTyping")
+})
+
+socket.on("update-room-memberList", (room) => {
+    renderMemberList(room.users);
+})
+socket.on("update-user-roomList", (user) => {
+    renderRoomContainer(user.rooms);
+    hideChatCanvasAndRoomInfoAfterLeave();
+})
+
 /* --------------------------- all button function -------------------------- */
 
 const toggoleRoomDialogBox = () =>{
@@ -165,6 +208,7 @@ const onSendMessage = (onEvent) => {
     const message = messageElelemnt.value;
     // brdocasting messae
     sendMessage(sessionStorage.getItem("roomId"), message);
+    messageElelemnt.value = ""
     // rendering the chat
     // renderChat({text : message, time : new Date()}, {email : localStorage.getItem("name"), name : localStorage.getItem("name")} , true);
 }
@@ -189,11 +233,56 @@ const onRoomSelect = (oEvent) => {
 
     joinRoom(oEvent.target.value);
 };
+
+const onEnterPressKey = (event) => {
+    if(event.key == 'Enter')
+        onSendMessage();
+    else{
+        if(!typingInfo.isTyping){
+            typingInfo.user = localStorage.getItem("name");
+            typingInfo.isTyping = true;
+            notifyTypying();
+        }
+
+        clearTimeout(typingInfo.typingTimeout); // Reset timeout if the user keeps typing
+
+        // Set a timeout to emit stopTyping if no input for 1.5 seconds
+        typingInfo.typingTimeout = setTimeout(() => {
+            typingInfo.user = "";
+            typingInfo.isTyping = false;
+            notifyTypying();
+        }, 3000); // Adjust timeout duration as needed
+    }
+}
+
+const onChatBackBtn = (oEvent) => {
+    hideUnhideOnMobileDevice("roomsListContainer") // on chat back button display the room list
+    sessionStorage.clear();
+}
+const onChatNextBtn = (oEvent) => {
+    hideUnhideOnMobileDevice("roomInfoContainer") // on chat info/ next button display room info 
+}
+const onRoominfoBackBtn = (oEvent) => {
+    hideUnhideOnMobileDevice("chatContainer") // on chat info/ next button display room info 
+}
+
+const onExitRoomBtn = (envet) => {
+    onRoomExit()
+}
 /* --------------------------- all render function -------------------------- */
 
 const renderChatRoomInfoContainer = (user) => {
     renderRoomContainer(user.rooms);
     renderUserFullInfo(user);
+}
+
+const hideUnhideOnMobileDevice = (id) => {
+    mainContainerList.forEach(contaienr => {
+        if(contaienr.id == id)
+            contaienr.classList.remove("mobileCompability")
+        else
+            contaienr.classList.add("mobileCompability")
+    })
 }
 
 const renderGroupinfoContainer = (group) => {
@@ -203,9 +292,24 @@ const renderGroupinfoContainer = (group) => {
     toggleElementViewDisplay(groupContainer, true);
 }
 
+const hideChatCanvasAndRoomInfoAfterLeave = () => {
+    const groupContainer = document.getElementById("groupContainer");
+    toggleElementViewDisplay(groupContainer, false);
+    const chatCanvas = document.getElementById("chatCanvasContainer");
+    toggleElementViewDisplay(chatCanvas, false);
+    sessionStorage.clear()
+
+    renderChatRoomTitle("Chats");
+
+    if(isMobileDevice()){
+        hideUnhideOnMobileDevice("roomsListContainer") // after exit display chat list container
+    }
+}
+
 // render user details section
 const renderUserFullInfo = (user) => {
     renderUserFullName(user.name);
+    renderUserDp(user.avatar);
 }
 
 const renderChatRoomForFirstTime = (rooms) => {
@@ -220,8 +324,7 @@ const renderChatRoomForFirstTime = (rooms) => {
 
 const renderChatRoomTitle = (roomName) => {
     const chatRoomTtitle = document.getElementById("chatRoomTtitle");
-    chatRoomTtitle.innerHTML = "";
-    chatRoomTtitle.insertAdjacentHTML("beforeend",`<span>${roomName}</span>`);    
+    chatRoomTtitle.innerText = roomName; 
 }
 
 // render rooms info
@@ -250,6 +353,10 @@ const renderUserFullName = (name) => {
     const fullNameSpan = document.createElement("span");
     fullNameSpan.innerHTML = name;
     userNameContainerElemetn.appendChild(fullNameSpan);
+}
+const renderUserDp = (url = "https://w1.pngwing.com/pngs/743/500/png-transparent-circle-silhouette-logo-user-user-profile-green-facial-expression-nose-cartoon-thumbnail.png") => {
+    let dpimg = document.getElementById("dp-img");
+    dpimg.src = url;
 }
 
 // render Chat
@@ -329,4 +436,16 @@ const updateUserStatus = (userId, active) => {
         groupMemberList.classList.remove("onlineMember");
     else if(active == "online" && !groupMemberList.classList.contains("onlineMember"))
         groupMemberList.classList.add("onlineMember");
+}
+
+const renderTypingInfo = (name, action) => {
+    const typingContainer = document.getElementById("typing-container");
+    if(action == "typing"){
+        typingContainer.innerText = name + " is typing... ";
+        typingContainer.classList.remove("disPlayNone");
+    }
+    else if(action == "stopTyping"){
+        typingContainer.innerText = "";
+        typingContainer.classList.add("disPlayNone")
+    }
 }

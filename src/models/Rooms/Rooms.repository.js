@@ -74,7 +74,25 @@ export const addMessage = async (message, roomId) => {
     await room.save();
     return await newMsg.populate({path:"user" , select : "name avatar email"});
 }
+
 export const roomMemberListRepo = async (roomId) => {
     const room = await RoomModel.findOne({roomId}).populate({path : "user"});
     return room;
 }
+
+export const deleteUserFromRooms = async (roomId, userId) => {
+    const updatedRoom = await RoomModel.findOneAndUpdate(
+        { roomId : roomId },
+        { $pull: { users: userId } },
+        { new: true } // Option to return the modified document
+    );
+    const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        { $pull: { rooms: { room: updatedRoom._id } } },
+        { new: true } // Option to return the modified document
+    );
+    return {
+        room  : await updatedRoom.populate({path:"users"}),
+        user : await updatedUser.populate({path:"rooms.room"})
+    }
+} 

@@ -8,7 +8,7 @@ import {errorHandlerMiddleware, errorHandelMiddlewareOfSocket} from './src/middl
 import userRouter from './src/routes/user.routes.js';
 import {authenticateUserViaHttp,authenticateUserViaSocket} from './src/middleware/jwtAuthorizationMiddleware.js';
 import { MessageBuilder } from './src/utils/msgBuilder.js';
-import { createRoom, getAllMsgByRoom, getRoomMemberList, handelUserJoin, saveMessage } from './src/controllers/Rooms/room.controller.js';
+import { createRoom, getAllMsgByRoom, getRoomMemberList, handelUserJoin, saveMessage,removeUserFromGroup } from './src/controllers/Rooms/room.controller.js';
 import { updateActiveStatus } from './src/controllers/User/users.contorller.js';
 
 dotenv.config();
@@ -90,14 +90,35 @@ io.on("connection", async (socket) => {
 
     socket.on("send-msg", async (messageInfo) => {
         let message = await saveMessage(messageInfo.message, messageInfo.roomId, socket.user._id);
+        if(!message)
+            return;
         let msg  = message.toJSON();
         msg["roomId"] = messageInfo.roomId;
-        io.to(messageInfo.roomId).emit("message-brodcust", msg);
+        io.to(messageInfo.roomId).emit("message-brodcust", msg);    // sending the message to every one
+        socket.to(messageInfo.roomId).emit("on-typing","")   // stoping the typing status
+    })
+
+    socket.on("typing", (typingInfo) => {
+        if(typingInfo. typingStatus){
+            socket.to(typingInfo.roomId).emit("on-typing", socket.user.name)
+        }
+        else{
+            socket.to(typingInfo.roomId).emit("on-typing","")
+        }
+    })
+
+    socket.on("exit-room", async ({roomId}) => {
+        const removeInfo = await removeUserFromGroup(roomId, socket);
+        socket.to(roomId).emit("message-brodcust",removeInfo.newMsg);
+        socket.to(roomId).emit("update-room-memberList", removeInfo.roomAndUser.room);
+        socket.emit("update-user-roomList", removeInfo.roomAndUser.user);
+
     })
 
     socket.on("error", (error) => {
         console.log(error);
     })
+    
     
     socket.on("disconnect", async ()=>{
         // update user active status offline

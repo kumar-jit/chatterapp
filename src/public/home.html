@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./style.css" >
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=add" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <title>Chatter App</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script>
         // Check if the key exists in localStorage before the page content loads
         if (!localStorage.getItem('jwttoken')) {
@@ -19,22 +20,22 @@
     <div class="dialogBox disPlayNone" id="roomDialogBox">
         <div class="dialogBox-conatiner">
             <div class="dialogBox-head">
-                <h4>Create or Join to Rooms</h4>
+                <span> </span>
                 <button onclick="toggoleRoomDialogBox()">Close</button>
             </div>
             <div class="dialogBox-body">
                 <div class="join-container">
-                    <h5>Join A Room</h5>
+                    <h3 class="dialog-title2">Join A Room</h3>
                     <hr>
-                    <input title="Room Id" type="text" max="6" min="6" placeholder="Enter room Id" id="inputRoomId">
-                    <button class="" onclick="onJoinRoomBtn(event)">Join Room</button>
+                    <input title="Room Id" type="text" max="6" min="6" placeholder="Enter room Id" id="inputRoomId" required>
+                    <button class="dialog-btn" onclick="onJoinRoomBtn(event)">Join Room</button>
                 </div>
                 <div class="create-container">
-                    <h5>Create A Room</h5>
+                    <h3 class="dialog-title2">Create A Room</h3>
                     <hr>
-                    <input title="Room Name" type="text" max="50" min="3" placeholder="Enter room name" id="inputRoomName">
+                    <input title="Room Name" type="text" max="50" min="3" placeholder="Enter room name" id="inputRoomName" required>
                     <textarea  title="Room Description" placeholder="Enter room description" id="inputRoomDesc" > </textarea>
-                    <button class="" onclick="onCreateRoomBtn(event)">Create Room</button>
+                    <button class="dialog-btn" onclick="onCreateRoomBtn(event)">Create Room</button>
                 </div>
             </div>
         </div>
@@ -43,10 +44,10 @@
     <div class="flex space-between flex-align-center nav-bar-container">
         <div class="profile-details">
             <div class="profile-image online-status">
-                <img alt="Profile Image" class="nav-dp" src="https://w1.pngwing.com/pngs/743/500/png-transparent-circle-silhouette-logo-user-user-profile-green-facial-expression-nose-cartoon-thumbnail.png">
+                <img alt="Profile Image" class="nav-dp" src="https://w1.pngwing.com/pngs/743/500/png-transparent-circle-silhouette-logo-user-user-profile-green-facial-expression-nose-cartoon-thumbnail.png" id="dp-img">
             </div>
             <div id="userFullNameContainer" class="nav-name">
-                <span>kumarjit ASda dasd as s</span>
+                <!-- <span>kumarjit</span> -->
             </div>
         </div>
         <div class="logout-container">
@@ -55,8 +56,8 @@
     </div>
     <div class="main-container flex flex-center">
         <!-- --------------------------- Rooms Container --------------------------- -->
-        <div class="flex-column side-width rooms-container main-box">
-            <div class="box-container-header">
+        <div class="flex-column side-width rooms-container main-box " id="roomsListContainer">
+            <div class="box-container-header justify-content-center">
                 <span>Rooms</span>
                 <div class="headr-action-button-container">
                     <button class="round-btn" title="Join new Room" onclick="toggoleRoomDialogBox()">
@@ -65,7 +66,7 @@
                 </div>
             </div>
             <div class="rooms-body-container scroll-style" id="roomContainer">
-                <label class="rooms-list">
+                <!-- <label class="rooms-list">
                     <input type="radio" onchange="onRoomSelect(event)" name="room" class="room-radio" value="213"/>
                     <span class="room-name">Room name</span>
                 </label>
@@ -76,20 +77,31 @@
                 <label class="rooms-list">
                     <input type="radio" name="room" class="room-radio" value="213"/>
                     <span class="room-name">Room name</span>
-                </label>
+                </label> -->
             </div>
             
         </div>
 
         <!-- --------------------------- Chat conatainer --------------------------- -->
-        <div class="flex-column main-width chat-container main-box">
-            <div class="box-container-header" id="chatRoomTtitle" >
-                <span>Chats</span>
+        <div class="flex-column main-width chat-container main-box mobileCompability" id="chatContainer">
+            <div class="box-container-header justify-content-spacebetween" id="chatRoomTtitle-container" >
+                <button title="Room List" class="onlyMobileView round-btn" id="chat-back" onclick="onChatBackBtn(event)">
+                    <span class="material-symbols-outlined btn-color">
+                        chevron_backward
+                    </span>
+                </button>
+                <span id="chatRoomTtitle">Chat</span>
+                <button title="Room Info" class="onlyMobileView round-btn" id="chat-next" onclick="onChatNextBtn(event)">
+                    <span class="material-symbols-outlined btn-color">
+                        info
+                    </span>
+                </button>
             </div>
 
             <section class="msger disPlayNone" id="chatCanvasContainer">
+                <span class="typing-notify disPlayNone" id="typing-container"></span>
                 <main class="msger-chat scroll-style" id="chatCanvas">
-                  <div class="msg left-msg">
+                  <!-- <div class="msg left-msg">
                     <div class="msg-img"
                      style="background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg)"
                     ></div>
@@ -105,7 +117,6 @@
                       </div>
                     </div>
                   </div>
-
                   <div class="msg center-msg">
                     <div class="msg-specialInfo">
                       <div class="msg-text">
@@ -113,52 +124,57 @@
                       </div>
                     </div>
                   </div>
-              
-              
                   <div class="msg right-msg">
                     <div
                      class="msg-img"
                      style="background-image: url(https://image.flaticon.com/icons/svg/145/145867.svg)"
                     ></div>
-              
                     <div class="msg-bubble">
                       <div class="msg-info">
                         <div class="msg-info-name">Sajad</div>
                         <div class="msg-info-time">12:46</div>
                       </div>
-              
                       <div class="msg-text">
                         You can change your name in JS section!
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                 </main>
                 <div class="msger-inputarea" >
-                    <input type="text" class="msger-input" placeholder="Enter your message..." id="message-input">
-                    <button type="submit" class="msger-send-btn" onclick="onSendMessage(event)">Send</button>
+                    <input type="text" class="msger-input" onkeypress="onEnterPressKey(event)" placeholder="Enter your message..." id="message-input">
+                    <button type="submit" class="msger-send-btn" onclick="onSendMessage(event)" >Send</button>
                 </div>
             </section>
             
         </div>
 
-        <!-- ------------------------ Group info Container ------------------------- -->
-        <div class="flex-column side-width group-info-container main-box">
-            <div class="box-container-header" id="groupCanvas">
-                <span>Group Info</span>
+        <!-- ------------------------ Room info Container ------------------------- -->
+        <div class="flex-column side-width group-info-container main-box mobileCompability" id="roomInfoContainer">
+            <div class="box-container-header justify-content-spacebetween" id="groupCanvas">
+                <button title="Chats" class="onlyMobileView round-btn" id="roomInfo-back" onclick="onRoominfoBackBtn(event)">
+                    <span class="material-symbols-outlined btn-color">
+                        chevron_backward
+                    </span>
+                </button>
+                <span>Room Info</span>
+                <span></span>
             </div>
             <div class="group-Info-body scroll-style disPlayNone" id="groupContainer">
                 <div class="group-info-head" id="groupInfoHead">
-                    <span class="group-info-title">Group Name</span>
+                    <!-- <span class="group-info-title">Room Name</span>
                     <span class="goup-info-desc">this is frist group</span>
                     <span class="gourp-admin-details">Id : </span>
-                    <span class="gourp-admin-details">by me</span>
+                    <span class="gourp-admin-details">by me</span> -->
+                </div>
+                <div class="extra-btn">
+                    <button title="Exit room" class="room-ext-btn" onclick="onExitRoomBtn(event)">Exit Room</button>
                 </div>
                 <div class="group-member-list-container">
                     <div class="memberlist-head">
                         <span>Members</span>
                     </div>
                     <div class="memberlist" id="groupMemberList">
-                        <div class="member-profile">
+                        <!-- <div class="member-profile">
                             <div class="member-profile-img">
                                 <img alt="profile imge" src="https://w7.pngwing.com/pngs/831/88/png-transparent-user-profile-computer-icons-user-interface-mystique-miscellaneous-user-interface-design-smile-thumbnail.png">
                             </div>
@@ -169,14 +185,14 @@
                                 <img alt="profile imge" src="https://w7.pngwing.com/pngs/831/88/png-transparent-user-profile-computer-icons-user-interface-mystique-miscellaneous-user-interface-design-smile-thumbnail.png">
                             </div>
                             <span>degg</span>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
+                
             </div>
         </div>
     </div>
 
-    
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     

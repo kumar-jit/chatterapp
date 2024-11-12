@@ -1,4 +1,4 @@
-import { createRoomRepo, getAllChatRepo, addNewUserToRoomRepo, addMessage,roomMemberListRepo } from '../../models/Rooms/Rooms.repository.js';
+import { createRoomRepo, getAllChatRepo, addNewUserToRoomRepo, addMessage,roomMemberListRepo, deleteUserFromRooms } from '../../models/Rooms/Rooms.repository.js';
 import { ErrorHandler } from '../../utils/errorHandler.js';
 import { generateRandomSixDigitNumber } from '../../utils/roomIdGenerate.js';
 
@@ -46,6 +46,8 @@ export const handelUserJoin = async (roomId, socket) => {
 }
 
 export const saveMessage = async (message, roomId, userId, type = "normal") => {
+    if(!message)
+        return undefined;
     try {
         let msg = {
             user: userId,
@@ -65,5 +67,23 @@ export const getRoomMemberList = async (roomId) => {
     }
     catch(error){
         throw error
+    }
+}
+
+export const removeUserFromGroup = async (roomId, socket) => {
+    try {
+        let user = socket.user;
+        let roomAndUser = await deleteUserFromRooms(roomId,user._id);
+        let msg = {
+            user: user._id,
+            content: user.name + " has left the room.",
+            type: "notify",
+            timestamp: new Date()
+        }
+        let newMsg = await addMessage(msg,roomId);
+        return {roomAndUser, newMsg}
+            
+    } catch (error) {
+        console.log(error);
     }
 }
