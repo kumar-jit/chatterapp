@@ -62,7 +62,7 @@ export const addNewUserToRoomRepo = async (room, user) => {
     await room.populate({ path: 'admin', select: 'name avatar' });
     await room.populate({ path: 'users', select: 'name avatar isOnline' });
     await room.populate({ path: 'chats'});
-
+    await room.populate({ path: 'chats.user'});
     return room;
 }
 
